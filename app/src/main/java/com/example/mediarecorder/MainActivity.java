@@ -1,9 +1,13 @@
 package com.example.mediarecorder;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 
 import java.io.File;
+
+import android.view.MotionEvent;
+import android.view.View.OnTouchListener;
 import android.widget.Button;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -41,6 +45,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
         mySurfaceView = (SurfaceView) findViewById(R.id.surfaceView1);
         SurfaceHolder holder = mySurfaceView.getHolder();
         holder.addCallback(mSurfaceListener);
@@ -71,11 +77,9 @@ public class MainActivity extends Activity {
             myCamera.stopPreview();
             myCamera.release();
             myCamera = null;
-
         }
 
-        public void surfaceChanged(SurfaceHolder holder, int format, int width,
-                                   int height) {
+        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             // TODO Auto-generated method stub
             v_holder = holder; // SurfaceHolderを保存
 
@@ -94,7 +98,7 @@ public class MainActivity extends Activity {
             paramLayout.width = 1920;
             paramLayout.height = 1080;
             mySurfaceView.setLayoutParams(paramLayout);
-            myCamera.setDisplayOrientation(0);// カメラを回転
+            myCamera.setDisplayOrientation(180);// カメラを回転
 
             //List<Camera.Size> size = parameters.getSupportedPreviewSizes();
 
@@ -105,19 +109,12 @@ public class MainActivity extends Activity {
         }
     };
 
-
-
-   // final View.OnClickListener b7OnClickListener = new View.OnClickListener() {
-     //   @Override
-
-
-
    public void click(View v) {
             // 録画中でなければ録画を開始
             if (!isRecording) {
 
-                initializeVideoSettings(); // MediaRecorderの設定
-              //  mediaRecorder.start(); // 録画開始
+                initializeVideoSettings();// MediaRecorderの設定
+                //  mediaRecorder.start(); // 録画開始
                 isRecording = true; // 録画中のフラグを立てる
 
                 // 録画中であれば録画を停止
@@ -133,7 +130,7 @@ public class MainActivity extends Activity {
                 isRecording = false; // 録画中のフラグを外す
             }
         }
-   // };
+
 
 
     private void initializeVideoSettings() {
@@ -145,9 +142,7 @@ public class MainActivity extends Activity {
             //mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
             //mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 
-
             myCamera.unlock();
-
             mediaRecorder.setCamera( myCamera );
             mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA); // 録画の入力ソースを指定
 //            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -158,18 +153,13 @@ public class MainActivity extends Activity {
             //CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
             //mediaRecorder.setProfile(profile);
 
-            mediaRecorder.setVideoFrameRate(24); // 動画のフレームレートを指定
+            mediaRecorder.setVideoFrameRate(30); // 動画のフレームレートを指定
             mediaRecorder.setVideoSize(1920, 1080); // 動画のサイズを指定
-
             File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),"Camera");
-           // File folder = getCacheDir();
-           // File file;
-            File file = File.createTempFile("sample20110603", ".mp4", folder);//
-
+            File file = File.createTempFile("sample", ".mp4", folder);//
             mediaRecorder.setOutputFile(file.getAbsolutePath());
-            mediaRecorder.setPreviewDisplay(v_holder.getSurface());//
-
-
+            mediaRecorder.setPreviewDisplay(v_holder.getSurface());
+            mediaRecorder.setOrientationHint(180);
             mediaRecorder.prepare();
             mediaRecorder.start();
         } catch (IOException e) {
@@ -177,18 +167,7 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
     }
-    //private static File getOutputMediaFile(){
-    //    File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyCameraApp");
-    //    if (! mediaStorageDir.exists()){
-    //        if (! mediaStorageDir.mkdirs()){
-    //            Log.d("MyCameraApp", "failed to create directory");
-    //            return null;
-    //        }
-    //    }
-    //    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-    //    File mediaFile = new File(mediaStorageDir.getPath() + File.separator + "VID_"+ timeStamp + ".mpg");
-    //    return mediaFile;
-    // }
+
 
     private Camera getCameraInstance() {
         // TODO 自動生成されたメソッド・スタブ
